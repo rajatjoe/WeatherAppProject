@@ -7,6 +7,13 @@ const searchForm = document.querySelector("[data-searchForm]");
 const loadingScreen = document.querySelector(".loading-container");
 const userInfoContainer = document.querySelector(".user-info-container");
 
+
+const notFound = document.querySelector('.errorContainer');
+const errorBtn = document.querySelector('[data-errorButton]');
+const errorText = document.querySelector('[data-errorText]');
+const errorImage = document.querySelector('[data-errorImg]');
+
+
 let oldTab = userTab;
 const API_KEY = "d31006416fd36fae40ec2ab3a5db1138";
 oldTab.classList.add("current-tab");
@@ -14,6 +21,7 @@ oldTab.classList.add("current-tab");
 getfromSessionStorage();
 
 function switchTab(newTab) {
+    notFound.classList.remove("active");
     if (newTab != oldTab) {
         oldTab.classList.remove("current-tab");
         oldTab = newTab;
@@ -77,6 +85,13 @@ async function fetchUserWeatherInfo(coordinates) {
     } catch (e) {
         loadingScreen.classList.remove("active");
         //HW
+        loadingContainer.classList.remove('active');
+        notFound.classList.add('active');
+        errorImage.style.display = 'none';
+        errorText.innerText = `Error: ${err?.message}`;
+        errorBtn.style.display = 'block';
+        errorBtn.addEventListener("click", fetchWeatherInfo);
+
     }
 }
 
@@ -145,16 +160,24 @@ async function fetchSearchWeatherInfo(city) {
     loadingScreen.classList.add("active");
     userInfoContainer.classList.remove("active");
     grantAccessContainer.classList.remove("active");
+    notFound.classList.remove("active");
 
     try {
         const response = await fetch(
             `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
         );
         const data = await response.json();
+        if (!data.sys) {
+            throw data;
+        }
         loadingScreen.classList.remove("active");
         userInfoContainer.classList.add("active");
         renderWeatherInfo(data);
     } catch (err) {
-
+        loadingContainer.classList.remove('active');
+        userInfoContainer.classList.remove('active');
+        notFound.classList.add('active');
+        errorText.innerText = `${err?.message}`;
+        errorBtn.style.display = "none";
     }
 }
