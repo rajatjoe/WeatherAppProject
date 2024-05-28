@@ -19,7 +19,6 @@ const API_KEY = "d31006416fd36fae40ec2ab3a5db1138";
 oldTab.classList.add("current-tab");
 
 getfromSessionStorage();
-
 function switchTab(newTab) {
     notFound.classList.remove("active");
     if (newTab != oldTab) {
@@ -80,6 +79,7 @@ async function fetchUserWeatherInfo(coordinates) {
         const data = await response.json();
         loadingScreen.classList.remove("active");
         userInfoContainer.classList.add("active");
+        notFound.classList.remove('active');
         renderWeatherInfo(data);
 
     } catch (e) {
@@ -174,10 +174,10 @@ async function fetchSearchWeatherInfo(city) {
         userInfoContainer.classList.add("active");
         renderWeatherInfo(data);
     } catch (err) {
-        loadingContainer.classList.remove('active');
+        loadingScreen.classList.remove('active');
         userInfoContainer.classList.remove('active');
         notFound.classList.add('active');
         errorText.innerText = `${err?.message}`;
-        errorBtn.style.display = "none";
+        errorBtn.style.display = "all";
     }
 }
